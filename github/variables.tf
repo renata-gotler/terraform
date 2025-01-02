@@ -35,8 +35,8 @@ locals {
       surname         = "Gotler"
       github_username = "renata-gotler"
       email           = "renata.gotler@gmail.com"
-      department      = local.user_defaults.departments.technology.name
-      job_title       = local.user_defaults.departments.technology.job_titles.sr_ml_engineer
+      department      = local.departments.technology.name
+      job_title       = local.departments.technology.job_titles.sr_ml_engineer
       _group_membership = [
         "ArtificialIntelligence",
         "DataEngineering",

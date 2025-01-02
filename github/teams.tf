@@ -4,7 +4,7 @@ resource "github_team" "teams" {
 
   name        = each.key
   description = "Auto-generated via Terraform"
-  privacy     = "public"
+  privacy     = "secret"
 }
 
 resource "github_team_members" "team_members" {
