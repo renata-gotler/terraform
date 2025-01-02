@@ -1,0 +1,62 @@
+name: "Terraform: Apply"
+
+on:
+  workflow_call:
+    inputs:
+      WORKING_DIR:
+        required: true
+        type: string
+      ENVIRONMENT:
+        required: false
+        type: string
+        default: production
+      TF_PLAN:
+        required: true
+        type: string
+
+env:
+  TF_APPLY_FOLDER: /tmp/tfapply
+  TF_APPLY_PARALLELISM_LIMIT: 30
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    # removed because billing was growing, not part of "included minutes"
+    # https://subscription.packtpub.com/book/cloud-and-networking/9781835468944/1/ch01lvl1sec05/pricing-for-github-actions
+    # runs-on:
+    #   group: Terraform
+    environment: ${{ inputs.ENVIRONMENT }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # https://github.com/hashicorp/setup-terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "latest"
+
+      - name: Terraform Init
+        run: terraform init
+        shell: bash
+        working-directory: ${{ inputs.WORKING_DIR }}
+
+      - name: Create local folder for plan
+        run: mkdir -p ${{ env.TF_APPLY_FOLDER }}
+        shell: bash
+    
+      - name: Download plan artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.TF_PLAN }}
+          path: ${{ env.TF_APPLY_FOLDER }}
+
+      - name: Terraform Show
+        run: terraform show ${{ env.TF_APPLY_FOLDER }}/${{ inputs.TF_PLAN }}
+        working-directory: ${{ inputs.WORKING_DIR }}
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -parallelism=${{ env.TF_APPLY_PARALLELISM_LIMIT }} ${{ env.TF_APPLY_FOLDER }}/${{ inputs.TF_PLAN }}
+        shell: bash
+        working-directory: ${{ inputs.WORKING_DIR }}

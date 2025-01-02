@@ -1,0 +1,26 @@
+
+name: 'Terraform CD: Github'
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - github/**
+      - .github/workflows/cd__github.yml
+  workflow_dispatch:
+
+jobs:
+  plan:
+    uses: ./.github/workflows/base__plan.yml
+    with:
+      WORKING_DIR: ./github
+    secrets:
+      github_CREDENTIALS: ${{ secrets.github_CREDENTIALS }}
+
+  apply:
+    uses: ./.github/workflows/base__apply.yml
+    needs: plan
+    with:
+      WORKING_DIR: ./github
+      TF_PLAN: ${{ needs.plan.outputs.TF_PLAN }}

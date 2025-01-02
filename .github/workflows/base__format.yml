@@ -1,0 +1,55 @@
+name: "Terraform: Basic validations"
+
+on:
+  workflow_call:
+    inputs:
+      WORKING_DIR:
+        required: true
+        type: string
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      # https://github.com/hashicorp/setup-terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "latest"
+
+      - name: Terraform Init
+        run: terraform init
+        shell: bash
+        working-directory: ${{ inputs.WORKING_DIR }}
+
+      - name: Terraform Validate
+        run: terraform validate
+        shell: bash
+        working-directory: ${{ inputs.WORKING_DIR }}
+
+      - name: Terraform Format
+        run: terraform fmt --recursive
+        working-directory: ${{ inputs.WORKING_DIR }}
+        
+      # https://github.com/stefanzweifel/git-auto-commit-action
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'terraform-fmt: style formatting for ${{ inputs.WORKING_DIR }}'
+
+        # Render terraform docs inside the README.md and push changes back to PR branch
+        # https://github.com/terraform-docs/gh-actions?tab=readme-ov-file#terraform-docs-github-actions
+      - name: Terraform Docs
+        uses: terraform-docs/gh-actions@v1.1.0
+        with:
+          find-dir: ${{ inputs.WORKING_DIR }}
+          output-file: README.md
+          output-method: inject
+          git-push: true
+          git-commit-message: "terraform-docs: updated readme for ${{ inputs.WORKING_DIR }}"
+  

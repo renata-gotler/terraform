@@ -1,0 +1,26 @@
+
+name: 'Terraform CI: Github'
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - github/**
+      - .github/workflows/ci__github.yml
+
+jobs:
+  format:
+    uses: ./.github/workflows/base__format.yml
+    with:
+      WORKING_DIR: ./github
+    secrets:
+      github_CREDENTIALS: ${{ secrets.github_CREDENTIALS }}
+  
+  plan:
+    # needs: format
+    uses: ./.github/workflows/base__plan.yml
+    with:
+      WORKING_DIR: ./github
+    secrets:
+      github_CREDENTIALS: ${{ secrets.github_CREDENTIALS }}
