@@ -16,7 +16,7 @@ jobs:
       WORKING_DIR: ./github
   
   plan:
-    # needs: format
+    needs: format
     uses: ./.github/workflows/base__plan.yml
     with:
       WORKING_DIR: ./github
