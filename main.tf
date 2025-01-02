@@ -19,3 +19,23 @@ provider "github" {
 # resource "github_membership" "membership_for_user_x" {
    # ...
 # }
+
+import {
+  id = "ai_product_template"
+  to = module.github.github_repository.this["ai_product_template"]
+}
+
+import {
+  id = "ai_project_example"
+  to = module.github.github_repository.this["ai_project_example"]
+}
+
+import {
+  id = "asl-ml-immersion"
+  to = module.github.github_repository.this["asl-ml-immersion"]
+}
+
+import {
+  id = "studies"
+  to = module.github.github_repository.this["studies"]
+}
