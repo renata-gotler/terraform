@@ -14,13 +14,9 @@ jobs:
     uses: ./.github/workflows/base__format.yml
     with:
       WORKING_DIR: ./github
-    secrets:
-      github_CREDENTIALS: ${{ secrets.github_CREDENTIALS }}
   
   plan:
     # needs: format
     uses: ./.github/workflows/base__plan.yml
     with:
       WORKING_DIR: ./github
-    secrets:
-      github_CREDENTIALS: ${{ secrets.github_CREDENTIALS }}
