@@ -28,20 +28,20 @@ provider "github" {
 
 import {
   id = "ai_product_template"
-  to = module.github.github_repository.this["ai_product_template"]
+  to = github.github_repository.this["ai_product_template"]
 }
 
 import {
   id = "ai_project_example"
-  to = module.github.github_repository.this["ai_project_example"]
+  to = github.github_repository.this["ai_project_example"]
 }
 
 import {
   id = "asl-ml-immersion"
-  to = module.github.github_repository.this["asl-ml-immersion"]
+  to = github.github_repository.this["asl-ml-immersion"]
 }
 
 import {
   id = "studies"
-  to = module.github.github_repository.this["studies"]
+  to = github.github_repository.this["studies"]
 }
