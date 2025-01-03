@@ -5,20 +5,12 @@ on:
   push:
     branches:
       - main
-    paths:
-      - github/**
-      - .github/workflows/cd__github.yml
   workflow_dispatch:
 
 jobs:
   plan:
     uses: ./.github/workflows/base__plan.yml
-    with:
-      WORKING_DIR: ./github
 
   apply:
     uses: ./.github/workflows/base__apply.yml
     needs: plan
-    with:
-      WORKING_DIR: ./github
-      TF_PLAN: ${{ needs.plan.outputs.TF_PLAN }}
