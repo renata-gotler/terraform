@@ -23,7 +23,7 @@ provider "github" {
 
 # Adicionar um usuário para a organização
 # resource "github_membership" "membership_for_user_x" {
-   # ...
+# ...
 # }
 
 import {
