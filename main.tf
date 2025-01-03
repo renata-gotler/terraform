@@ -9,11 +9,17 @@ terraform {
       version = "~> 6.0"
     }
   }
+
+  backend "local" {
+    path = "./terraform.tfstate"
+  }
+
 }
 
 provider "github" {
   owner = "renata-gotler" # Troque pela sua conta pessoal ou organização
 }
+
 
 # Adicionar um usuário para a organização
 # resource "github_membership" "membership_for_user_x" {
