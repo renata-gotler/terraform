@@ -2,71 +2,45 @@ name: "Terraform: Plan"
 
 on:
   workflow_call:
-    inputs:
-      WORKING_DIR:
-        required: true
-        type: string
-      ENVIRONMENT:
-        required: false
-        type: string
-        default: development
-    outputs:
-      TF_PLAN:
-        description: "Terraform plan saved as artifact"
-        value: ${{ jobs.plan.outputs.TF_PLAN }}
 
 env:
-  TF_PLAN_FOLDER: /tmp/tfplan
-  TF_PLAN_FILE: tf-plan
   TF_PLAN_PARALLELISM_LIMIT: 30
 
 jobs:
   plan:
     runs-on: ubuntu-latest
-    # removed because billing was growing, not part of "included minutes"
-    # https://subscription.packtpub.com/book/cloud-and-networking/9781835468944/1/ch01lvl1sec05/pricing-for-github-actions
-    # runs-on:
-    #   group: Terraform
-    environment: ${{ inputs.ENVIRONMENT }}
-      
-    outputs:
-        TF_PLAN: ${{ steps.output.outputs.TF_PLAN }}
 
     steps:
-      - name: Checkout repo
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # https://github.com/hashicorp/setup-terraform
+      # Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "latest"
 
+      # Initialize Terraform
       - name: Terraform Init
-        run: terraform init
-        shell: bash
-        working-directory: ${{ inputs.WORKING_DIR }}
+        run: |
+          set -e
+          terraform init
 
-      - name: Create local folder for plan
-        run: mkdir -p ${{ env.TF_PLAN_FOLDER }}
-        shell: bash
-
+      # Generate Plan
       - name: Terraform Plan
-        run: terraform plan -parallelism=${{ env.TF_PLAN_PARALLELISM_LIMIT }} -out=${{ env.TF_PLAN_FOLDER }}/${{ env.TF_PLAN_FILE }}
-        shell: bash
-        working-directory: ${{ inputs.WORKING_DIR }}
+        run: |
+          set -e
+          terraform plan -parallelism="${{ env.TF_PLAN_PARALLELISM_LIMIT }}" -out="plan.out"
 
+      # Show Plan Details (Optional)
       - name: Terraform Show
-        run: terraform show ${{ env.TF_PLAN_FOLDER }}/${{ env.TF_PLAN_FILE }}
-        working-directory: ${{ inputs.WORKING_DIR }}
+        run: |
+          set -e
+          terraform show "plan.out"
 
-        # https://cloudlumberjack.com/posts/github-actions-approvals/
-      - name: Upload plan artifact
+      # Upload Plan as Artifact
+      - name: Upload Plan Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.TF_PLAN_FILE }}
-          path: ${{ env.TF_PLAN_FOLDER }}/${{ env.TF_PLAN_FILE }}
-
-      - name: Save output
-        id: output
-        run: echo "TF_PLAN=${{ env.TF_PLAN_FILE }}" >> $GITHUB_OUTPUT
+          name: terraform-plan
+          path: plan.out
