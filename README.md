@@ -20,7 +20,7 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [github_branch.development](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/branch) | resource |
+| [github_branch.dev](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/branch) | resource |
 | [github_branch_protection.dev](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/branch_protection) | resource |
 | [github_branch_protection.main](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/branch_protection) | resource |
 | [github_repository.this](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository) | resource |
@@ -30,10 +30,7 @@ No modules.
 
 ## Inputs
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| <a name="input_group"></a> [group](#input\_group) | n/a | `string` | n/a | yes |
-| <a name="input_team"></a> [team](#input\_team) | n/a | `string` | n/a | yes |
+No inputs.
 
 ## Outputs
 
