@@ -1,13 +1,5 @@
 
 
-variable "team" {
-  type = string
-}
-
-variable "group" {
-  type = string
-}
-
 locals {
 
   organization_name = "renata-gotler"

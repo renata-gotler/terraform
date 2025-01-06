@@ -50,7 +50,7 @@ resource "github_repository_collaborators" "this" {
   }
 }
 
-resource "github_branch" "development" {
+resource "github_branch" "dev" {
   for_each   = local.repo_list_foreach
   repository = each.key
   branch     = "dev"

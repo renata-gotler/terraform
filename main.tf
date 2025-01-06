@@ -20,20 +20,9 @@ provider "github" {
   owner = "renata-gotler" # Troque pela sua conta pessoal ou organização
 }
 
-
-# Adicionar um usuário para a organização
-# resource "github_membership" "membership_for_user_x" {
-# ...
-# }
-
 import {
   id = "ai_product_template"
   to = github_repository.this["ai_product_template"]
-}
-
-import {
-  id = "ai_project_example"
-  to = github_repository.this["ai_project_example"]
 }
 
 import {
