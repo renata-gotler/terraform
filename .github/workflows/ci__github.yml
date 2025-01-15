@@ -1,0 +1,15 @@
+
+name: 'Terraform CI: Github'
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  format:
+    uses: ./.github/workflows/base__format.yml
+  
+  plan:
+    needs: format
+    uses: ./.github/workflows/base__plan.yml

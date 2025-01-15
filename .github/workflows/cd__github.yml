@@ -1,0 +1,16 @@
+
+name: 'Terraform CD: Github'
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  plan:
+    uses: ./.github/workflows/base__plan.yml
+
+  apply:
+    uses: ./.github/workflows/base__apply.yml
+    needs: plan

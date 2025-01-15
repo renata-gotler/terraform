@@ -1,0 +1,46 @@
+name: "Terraform: Plan"
+
+on:
+  workflow_call:
+
+env:
+  TF_PLAN_PARALLELISM_LIMIT: 30
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Setup Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "latest"
+
+      # Initialize Terraform
+      - name: Terraform Init
+        run: |
+          set -e
+          terraform init
+
+      # Generate Plan
+      - name: Terraform Plan
+        run: |
+          set -e
+          terraform plan -parallelism="${{ env.TF_PLAN_PARALLELISM_LIMIT }}" -out="plan.out"
+
+      # Show Plan Details (Optional)
+      - name: Terraform Show
+        run: |
+          set -e
+          terraform show "plan.out"
+
+      # Upload Plan as Artifact
+      - name: Upload Plan Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan
+          path: plan.out
