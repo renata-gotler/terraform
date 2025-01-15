@@ -33,5 +33,5 @@ jobs:
           path: .
 
       - name: Apply Terraform Plan
-        run: terraform apply plan.out -auto-approve -parallelism=${{ env.TF_APPLY_PARALLELISM_LIMIT }}
+        run: terraform apply -auto-approve -parallelism=${{ env.TF_APPLY_PARALLELISM_LIMIT }} plan.out
 
