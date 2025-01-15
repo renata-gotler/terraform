@@ -25,31 +25,6 @@ resource "github_repository" "this" {
   }
 }
 
-resource "github_repository_collaborators" "this" {
-  for_each   = local.repo_list_foreach
-  repository = github_repository.this[each.key].name
-
-  # read < triage < push < maintain < admin
-  team {
-    team_id    = lower("GitHub-Admins")
-    permission = "admin"
-  }
-  dynamic "team" {
-    for_each = each.value.owning_teams
-    content {
-      team_id    = lower(team.value)
-      permission = "maintain"
-    }
-  }
-  dynamic "team" {
-    for_each = lookup(each.value, "user_teams", ["GitHub-Users"])
-    content {
-      team_id    = lower(team.value)
-      permission = "push"
-    }
-  }
-}
-
 resource "github_branch" "dev" {
   for_each   = local.repo_list_foreach
   repository = each.key
@@ -64,7 +39,7 @@ resource "github_branch_protection" "main" {
   enforce_admins                  = false
   allows_deletions                = false
   allows_force_pushes             = false
-  require_conversation_resolution = false
+  require_conversation_resolution = true
 
   required_status_checks {
     strict   = true
@@ -77,9 +52,6 @@ resource "github_branch_protection" "main" {
     require_last_push_approval      = true
     required_approving_review_count = 1
     restrict_dismissals             = true
-
-    dismissal_restrictions = toset([for team in each.value.owning_teams : lower("${local.organization_name}/${team}")])
-    pull_request_bypassers = toset([for team in each.value.owning_teams : lower("${local.organization_name}/${team}")])
   }
 }
 
@@ -104,8 +76,5 @@ resource "github_branch_protection" "dev" {
     require_last_push_approval      = true
     required_approving_review_count = 1
     restrict_dismissals             = true
-
-    dismissal_restrictions = toset([for team in each.value.owning_teams : lower("${local.organization_name}/${team}")])
-    pull_request_bypassers = toset([for team in each.value.owning_teams : lower("${local.organization_name}/${team}")])
   }
 }
