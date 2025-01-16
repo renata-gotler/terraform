@@ -10,7 +10,7 @@ terraform {
     }
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "=3.0.0"
+      version = "=4.15.0"
     }
   }
 
@@ -28,6 +28,7 @@ provider "github" {
 }
 
 provider "azurerm" {
+  subscription_id = "54a7ac13-c663-459e-aab5-74db69b7d7fe"
   features {}
 }
 
