@@ -2,36 +2,71 @@ name: "Terraform: Apply"
 
 on:
   workflow_call:
+    inputs:
+      TF_PLAN:
+        required: true
+        type: string
+    secrets:
+      AZURE_CREDENTIALS:
+        required: true
 
 env:
+  TF_APPLY_FOLDER: /tmp/tfapply
   TF_APPLY_PARALLELISM_LIMIT: 30
 
 jobs:
-  plan:
+  apply:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      # Setup Terraform
+      # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Cwindows#use-the-azure-login-action
+      - name: Log in with Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # https://gist.github.com/geekzter/77e29271d2677db2d854dadbdf25a77c
+      - name: Prepare environment variables
+        env:
+          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+        run: |
+          # Parse Azure secret into Terraform variables
+          $servicePrincipal = ($env:AZURE_CREDENTIALS | ConvertFrom-Json)
+          $env:ARM_CLIENT_ID = $servicePrincipal.clientId
+          $env:ARM_CLIENT_SECRET = $servicePrincipal.clientSecret
+          $env:ARM_SUBSCRIPTION_ID = $servicePrincipal.subscriptionId
+          $env:ARM_TENANT_ID = $servicePrincipal.tenantId
+
+          # Save environment variable setup for subsequent steps
+          Get-ChildItem -Path Env: -Recurse -Include ARM_*,TF_VAR_* | ForEach-Object {Write-Output "$($_.Name)=$($_.Value)"} >> $env:GITHUB_ENV
+        shell: pwsh
+
+      # https://github.com/hashicorp/setup-terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "latest"
 
-      # Initialize Terraform
       - name: Terraform Init
-        run: |
-          set -e
-          terraform init
+        run: terraform init
+        shell: bash
 
-      - name: Download Plan Artifact
+      - name: Create local folder for plan
+        run: mkdir -p ${{ env.TF_APPLY_FOLDER }}
+        shell: bash
+    
+      - name: Download plan artifact
         uses: actions/download-artifact@v4
         with:
-          name: terraform-plan
-          path: .
+          name: ${{ inputs.TF_PLAN }}
+          path: ${{ env.TF_APPLY_FOLDER }}
 
-      - name: Apply Terraform Plan
-        run: terraform apply -auto-approve -parallelism=${{ env.TF_APPLY_PARALLELISM_LIMIT }} plan.out
+      - name: Terraform Show
+        run: terraform show ${{ env.TF_APPLY_FOLDER }}/${{ inputs.TF_PLAN }}
 
+      - name: Terraform Apply
+        run: terraform apply  -auto-approve -parallelism=${{ env.TF_APPLY_PARALLELISM_LIMIT }}  ${{ env.TF_APPLY_FOLDER }}/${{ inputs.TF_PLAN }}
+        shell: bash

@@ -2,19 +2,41 @@ name: "Terraform: Basic validations"
 
 on:
   workflow_call:
+    secrets:
+      AZURE_CREDENTIALS:
+        required: true
 
 jobs:
   format:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
+
+      # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Cwindows#use-the-azure-login-action
+      - name: Log in with Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # https://gist.github.com/geekzter/77e29271d2677db2d854dadbdf25a77c
+      - name: Prepare environment variables
+        env:
+          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+        run: |
+          # Parse Azure secret into Terraform variables
+          $servicePrincipal = ($env:AZURE_CREDENTIALS | ConvertFrom-Json)
+          $env:ARM_CLIENT_ID = $servicePrincipal.clientId
+          $env:ARM_CLIENT_SECRET = $servicePrincipal.clientSecret
+          $env:ARM_SUBSCRIPTION_ID = $servicePrincipal.subscriptionId
+          $env:ARM_TENANT_ID = $servicePrincipal.tenantId
+
+          # Save environment variable setup for subsequent steps
+          Get-ChildItem -Path Env: -Recurse -Include ARM_*,TF_VAR_* | ForEach-Object {Write-Output "$($_.Name)=$($_.Value)"} >> $env:GITHUB_ENV
+        shell: pwsh
 
       # https://github.com/hashicorp/setup-terraform
       - name: Setup Terraform
@@ -36,15 +58,15 @@ jobs:
       # https://github.com/stefanzweifel/git-auto-commit-action
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: 'terraform-fmt: style formatting'
+          commit_message: 'terraform-fmt: style formatting.'
 
         # Render terraform docs inside the README.md and push changes back to PR branch
         # https://github.com/terraform-docs/gh-actions?tab=readme-ov-file#terraform-docs-github-actions
       - name: Terraform Docs
-        uses: terraform-docs/gh-actions@v1.1.0
+        uses: terraform-docs/gh-actions@v1.3.0
         with:
           output-file: README.md
           output-method: inject
           git-push: true
-          git-commit-message: "terraform-docs: update readme."
+          git-commit-message: "terraform-docs: updated readme."
   

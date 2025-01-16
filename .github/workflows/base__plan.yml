@@ -2,45 +2,101 @@ name: "Terraform: Plan"
 
 on:
   workflow_call:
+    secrets:
+      AZURE_CREDENTIALS:
+        required: true
+    outputs:
+      TF_PLAN:
+        description: "Terraform plan saved as artifact"
+        value: ${{ jobs.plan.outputs.TF_PLAN }}
+      HAS_CHANGES:
+        description: "YES if Terraform plan includes changes, NO if not"
+        value: ${{ jobs.plan.outputs.HAS_CHANGES }}
 
 env:
+  TF_PLAN_FOLDER: /tmp/tfplan
+  TF_PLAN_FILE: tf-plan
   TF_PLAN_PARALLELISM_LIMIT: 30
 
 jobs:
   plan:
     runs-on: ubuntu-latest
+      
+    outputs:
+      TF_PLAN: ${{ steps.plan_output.outputs.TF_PLAN }}
+      HAS_CHANGES: ${{ steps.has_changes.outputs.HAS_CHANGES }}
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      # Setup Terraform
+      # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Cwindows#use-the-azure-login-action
+      - name: Log in with Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # https://gist.github.com/geekzter/77e29271d2677db2d854dadbdf25a77c
+      - name: Prepare environment variables
+        env:
+          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+        run: |
+          # Parse Azure secret into Terraform variables
+          $servicePrincipal = ($env:AZURE_CREDENTIALS | ConvertFrom-Json)
+          $env:ARM_CLIENT_ID = $servicePrincipal.clientId
+          $env:ARM_CLIENT_SECRET = $servicePrincipal.clientSecret
+          $env:ARM_SUBSCRIPTION_ID = $servicePrincipal.subscriptionId
+          $env:ARM_TENANT_ID = $servicePrincipal.tenantId
+
+          # Save environment variable setup for subsequent steps
+          Get-ChildItem -Path Env: -Recurse -Include ARM_*,TF_VAR_* | ForEach-Object {Write-Output "$($_.Name)=$($_.Value)"} >> $env:GITHUB_ENV
+        shell: pwsh
+
+      # https://github.com/hashicorp/setup-terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "latest"
 
-      # Initialize Terraform
       - name: Terraform Init
-        run: |
-          set -e
-          terraform init
+        run: terraform init
+        shell: bash
 
-      # Generate Plan
+      - name: Create local folder for plan
+        run: mkdir -p ${{ env.TF_PLAN_FOLDER }}
+        shell: bash
+
       - name: Terraform Plan
-        run: |
-          set -e
-          terraform plan -parallelism="${{ env.TF_PLAN_PARALLELISM_LIMIT }}" -out="plan.out"
+        run: terraform plan  -parallelism=${{ env.TF_PLAN_PARALLELISM_LIMIT }}  -out=${{ env.TF_PLAN_FOLDER }}/${{ env.TF_PLAN_FILE }}
+        shell: bash
 
-      # Show Plan Details (Optional)
       - name: Terraform Show
+        run: terraform show ${{ env.TF_PLAN_FOLDER }}/${{ env.TF_PLAN_FILE }}
+      
+      - name: Check has changes
+        id: has_changes
         run: |
-          set -e
-          terraform show "plan.out"
+          PLAN_OUTPUT="$(terraform show -no-color ${{ env.TF_PLAN_FOLDER }}/${{ env.TF_PLAN_FILE }})"
+          
+          # Check if the "No changes" string is in PLAN_OUTPUT
+          if echo "$PLAN_OUTPUT" | grep -q "No changes.*Your infrastructure matches the configuration"; then
+            echo "HAS_CHANGES=NO" >> $GITHUB_OUTPUT
+          else
+            echo "HAS_CHANGES=YES" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
+      
+      - name: Print has_changes
+        run: echo "Value of HAS_CHANGES is ${{ steps.has_changes.outputs.HAS_CHANGES }}"
+        shell: bash
 
-      # Upload Plan as Artifact
-      - name: Upload Plan Artifact
+        # https://cloudlumberjack.com/posts/github-actions-approvals/
+      - name: Upload plan artifact
         uses: actions/upload-artifact@v4
         with:
-          name: terraform-plan
-          path: plan.out
+          name: ${{ env.TF_PLAN_FILE }}
+          path: ${{ env.TF_PLAN_FOLDER }}/${{ env.TF_PLAN_FILE }}
+
+      - name: Save output
+        id: plan_output
+        run: echo "TF_PLAN=${{ env.TF_PLAN_FILE }}" >> $GITHUB_OUTPUT
