@@ -27,7 +27,7 @@ resource "github_repository" "this" {
 
 resource "github_branch" "dev" {
   for_each   = local.repo_list_foreach
-  repository = each.key
+  repository = github_repository.this[each.key].name
   branch     = "dev"
 }
 

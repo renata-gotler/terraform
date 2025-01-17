@@ -9,11 +9,12 @@ on:
     secrets:
       AZURE_CREDENTIALS:
         required: true
+      GITHUB_TOKEN:
+        required: true
 
 env:
   TF_APPLY_FOLDER: /tmp/tfapply
   TF_APPLY_PARALLELISM_LIMIT: 30
-  GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
   GITHUB_OWNER: ${{ github.repository_owner }}
 
 jobs:
