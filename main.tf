@@ -23,9 +23,7 @@ terraform {
 
 }
 
-provider "github" {
-  owner = "renata-gotler" # Troque pela sua conta pessoal ou organização
-}
+provider "github" {}
 
 provider "azurerm" {
   subscription_id = "54a7ac13-c663-459e-aab5-74db69b7d7fe"
