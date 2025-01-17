@@ -17,7 +17,7 @@ env:
   TF_PLAN_FOLDER: /tmp/tfplan
   TF_PLAN_FILE: tf-plan
   TF_PLAN_PARALLELISM_LIMIT: 30
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
   GITHUB_OWNER: ${{ github.repository_owner }}
 
 jobs:
@@ -67,10 +67,6 @@ jobs:
       - name: Create local folder for plan
         run: mkdir -p ${{ env.TF_PLAN_FOLDER }}
         shell: bash
-
-      - name: Debug Environment Variables
-        run: |
-          echo "GITHUB_OWNER=${GITHUB_OWNER}"
 
       - name: Terraform Plan
         run: terraform plan  -parallelism=${{ env.TF_PLAN_PARALLELISM_LIMIT }}  -out=${{ env.TF_PLAN_FOLDER }}/${{ env.TF_PLAN_FILE }}
