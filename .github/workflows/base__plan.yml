@@ -17,6 +17,7 @@ env:
   TF_PLAN_FOLDER: /tmp/tfplan
   TF_PLAN_FILE: tf-plan
   TF_PLAN_PARALLELISM_LIMIT: 30
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   plan:
