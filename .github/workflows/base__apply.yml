@@ -14,6 +14,7 @@ env:
   TF_APPLY_FOLDER: /tmp/tfapply
   TF_APPLY_PARALLELISM_LIMIT: 30
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_OWNER: ${{ github.repository_owner }}
 
 jobs:
   apply:
