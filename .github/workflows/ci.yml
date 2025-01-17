@@ -1,5 +1,5 @@
 
-name: 'Terraform CI: Github'
+name: 'Terraform CI'
 
 on:
   pull_request:
@@ -9,7 +9,11 @@ on:
 jobs:
   format:
     uses: ./.github/workflows/base__format.yml
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
   
   plan:
     needs: format
     uses: ./.github/workflows/base__plan.yml
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}

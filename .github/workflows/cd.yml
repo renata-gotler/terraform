@@ -1,0 +1,23 @@
+
+name: 'Terraform CD'
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  plan:
+    uses: ./.github/workflows/base__plan.yml
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+
+  apply:
+    if: ${{ needs.plan.outputs.HAS_CHANGES == 'YES' }}
+    needs: plan
+    uses: ./.github/workflows/base__apply.yml
+    with:
+      TF_PLAN: ${{ needs.plan.outputs.TF_PLAN }}
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
