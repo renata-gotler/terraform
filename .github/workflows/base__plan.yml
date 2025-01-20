@@ -5,6 +5,9 @@ on:
     secrets:
       AZURE_CREDENTIALS:
         required: true
+      GITHUB_CREDENTIALS:
+        required: true
+
     outputs:
       TF_PLAN:
         description: "Terraform plan saved as artifact"
@@ -17,7 +20,6 @@ env:
   TF_PLAN_FOLDER: /tmp/tfplan
   TF_PLAN_FILE: tf-plan
   TF_PLAN_PARALLELISM_LIMIT: 30
-  GITHUB_OWNER: ${{ github.repository_owner }}
 
 permissions:
   contents: write
@@ -44,6 +46,8 @@ jobs:
       - name: Prepare environment variables
         env:
           AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_CREDENTIALS }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
         run: |
           # Parse Azure secret into Terraform variables
           $servicePrincipal = ($env:AZURE_CREDENTIALS | ConvertFrom-Json)
