@@ -54,6 +54,11 @@ import {
 }
 
 import {
+  id = "terraform"
+  to = module.github.github_repository.this["terraform"]
+}
+
+import {
   id = "/subscriptions/54a7ac13-c663-459e-aab5-74db69b7d7fe/resourceGroups/rg-fiap"
   to = module.azure.azurerm_resource_group.this
 }
