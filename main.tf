@@ -15,9 +15,9 @@ terraform {
   }
 
   backend "azurerm" {
-    resource_group_name  = module.azure.azurerm_resource_group.this.name
-    storage_account_name = module.azure.azurerm_storage_account.this.name
-    container_name       = module.azure.azurerm_storage_container.this.name
+    resource_group_name  = "rg-fiap"
+    storage_account_name = "safiapterraform"
+    container_name       = "terraform-state"
     key                  = "latest/infrastructure.tfstate"
   }
 
