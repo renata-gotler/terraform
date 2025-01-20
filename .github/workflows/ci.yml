@@ -6,16 +6,17 @@ on:
     branches:
       - main
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   format:
     uses: ./.github/workflows/base__format.yml
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-      GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
   
   plan:
     needs: format
     uses: ./.github/workflows/base__plan.yml
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-      GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}

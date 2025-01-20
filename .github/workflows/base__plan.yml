@@ -5,8 +5,6 @@ on:
     secrets:
       AZURE_CREDENTIALS:
         required: true
-      GITHUB_TOKEN:
-        required: true
     outputs:
       TF_PLAN:
         description: "Terraform plan saved as artifact"
