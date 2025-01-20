@@ -19,6 +19,9 @@ env:
   TF_PLAN_PARALLELISM_LIMIT: 30
   GITHUB_OWNER: ${{ github.repository_owner }}
 
+permissions:
+  contents: write
+
 jobs:
   plan:
     runs-on: ubuntu-latest

@@ -7,9 +7,6 @@ on:
       - main
   workflow_dispatch:
 
-env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 jobs:
   plan:
     uses: ./.github/workflows/base__plan.yml
