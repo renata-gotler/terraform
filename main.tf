@@ -15,9 +15,9 @@ terraform {
   }
 
   backend "azurerm" {
-    resource_group_name  = "rg-fiap"
-    storage_account_name = "safiapterraform"
-    container_name       = "terraform-state"
+    resource_group_name  = module.azure.azurerm_resource_group.this.name
+    storage_account_name = module.azure.azurerm_storage_account.this.name
+    container_name       = module.azure.azurerm_storage_container.this.name
     key                  = "latest/infrastructure.tfstate"
   }
 
@@ -61,10 +61,4 @@ import {
 import {
   id = "/subscriptions/54a7ac13-c663-459e-aab5-74db69b7d7fe/resourceGroups/rg-fiap/providers/Microsoft.Storage/storageAccounts/safiapterraform"
   to = module.azure.azurerm_storage_account.this
-}
-
-
-import {
-  id = "https://safiapterraform.blob.core.windows.net/terraform-state"
-  to = module.azure.azurerm_storage_container.this
 }
