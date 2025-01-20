@@ -27,7 +27,7 @@ resource "github_repository" "this" {
 
 resource "github_branch" "dev" {
   for_each   = local.repo_list_foreach
-  repository = each.key
+  repository = github_repository.this[each.key].name
   branch     = "dev"
 }
 
@@ -51,7 +51,7 @@ resource "github_branch_protection" "main" {
     require_code_owner_reviews      = true
     require_last_push_approval      = true
     required_approving_review_count = 1
-    restrict_dismissals             = true
+    restrict_dismissals             = false
   }
 }
 
@@ -75,6 +75,6 @@ resource "github_branch_protection" "dev" {
     require_code_owner_reviews      = true
     require_last_push_approval      = true
     required_approving_review_count = 1
-    restrict_dismissals             = true
+    restrict_dismissals             = false
   }
 }

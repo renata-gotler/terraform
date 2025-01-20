@@ -62,9 +62,3 @@ import {
   id = "/subscriptions/54a7ac13-c663-459e-aab5-74db69b7d7fe/resourceGroups/rg-fiap/providers/Microsoft.Storage/storageAccounts/safiapterraform"
   to = module.azure.azurerm_storage_account.this
 }
-
-
-import {
-  id = "https://safiapterraform.blob.core.windows.net/terraform-state"
-  to = module.azure.azurerm_storage_container.this
-}
