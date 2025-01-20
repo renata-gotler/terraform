@@ -51,7 +51,7 @@ resource "github_branch_protection" "main" {
     require_code_owner_reviews      = true
     require_last_push_approval      = true
     required_approving_review_count = 1
-    restrict_dismissals             = true
+    restrict_dismissals             = false
   }
 }
 
@@ -75,6 +75,6 @@ resource "github_branch_protection" "dev" {
     require_code_owner_reviews      = true
     require_last_push_approval      = true
     required_approving_review_count = 1
-    restrict_dismissals             = true
+    restrict_dismissals             = false
   }
 }
