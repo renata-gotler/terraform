@@ -12,7 +12,7 @@ jobs:
     uses: ./.github/workflows/base__plan.yml
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-      GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   apply:
     if: ${{ needs.plan.outputs.HAS_CHANGES == 'YES' }}
@@ -22,4 +22,4 @@ jobs:
       TF_PLAN: ${{ needs.plan.outputs.TF_PLAN }}
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-      GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
