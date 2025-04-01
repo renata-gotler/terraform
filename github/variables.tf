@@ -12,7 +12,7 @@ locals {
     { name = "terraform", owning_teams = ["Terraform-Admins"], status_checks_main = ["plan / plan"] },
   ]
 
-  repo_list_foreach = { for repo in local.repo_list : repo.name => repo }
+  # repo_list_foreach = { for repo in local.repo_list : repo.name => repo }
 
 }
 
