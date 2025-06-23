@@ -69,7 +69,7 @@ jobs:
       - name: Terraform Docs
         uses: terraform-docs/gh-actions@v1.3.0
         with:
-          working-dir: .,./azure,./github
+          working-dir: ./azure,./github
           output-file: README.md
           output-method: inject
           git-push: true
