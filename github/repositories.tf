@@ -15,6 +15,8 @@ resource "github_repository" "this" {
   is_template         = strcontains(each.key, "template")
   allow_update_branch = strcontains(each.key, "template")
 
+  auto_init = true
+
   dynamic "template" {
     for_each = contains(keys(each.value), "template_repo") ? toset([each.value.template_repo]) : []
     content {
