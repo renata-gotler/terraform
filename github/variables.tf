@@ -10,7 +10,6 @@ locals {
     { name = "studies", description = "Template repository for new AI projects" },
     { name = "asl-ml-immersion", description = "Template repository for new AI projects" },
     { name = "terraform", owning_teams = ["Terraform-Admins"], status_checks_main = ["plan / plan"] },
-    { name = "test", description = "Fiap class test" }
   ]
 
   repo_list_foreach = { for repo in local.repo_list : repo.name => repo }
