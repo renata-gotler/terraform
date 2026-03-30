@@ -6,7 +6,7 @@ resource "github_repository" "this" {
 
   visibility = "public"
 
-  has_downloads   = false
+  has_downloads   = true
   has_discussions = false
   has_issues      = false
   has_projects    = false
@@ -52,7 +52,7 @@ resource "github_branch_protection" "main" {
     dismiss_stale_reviews           = false
     require_code_owner_reviews      = true
     require_last_push_approval      = true
-    required_approving_review_count = 1
+    required_approving_review_count = 2
     restrict_dismissals             = false
   }
 }
